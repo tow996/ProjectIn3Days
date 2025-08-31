@@ -1,0 +1,20 @@
+@use '../includes/variables' as *;
+@use '../includes/mixins' as *;
+
+.not-found-page {
+    @include flex(column, center, center);
+    height: calc(100vh - 9rem);
+    text-align: center;
+    gap:2rem;
+    
+    h1 {
+        font-size: clamp(4rem, 10vw, 6rem);
+        color: $secondary-color;
+    }
+
+    p {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        color: #fff;
+        font-weight:bold;
+    }
+}

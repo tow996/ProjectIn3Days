@@ -1,0 +1,126 @@
+@use "sass:map";
+
+$breakpoints: (
+    xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px
+);
+
+$font-sizes: (
+    'base': (
+        xs: 16px,
+        sm: 17px,
+        md: 18px,
+        lg: 19px,
+        xl: 20px,
+        xxl: 21px
+    ),
+    'h1': (
+        xs: 32px,
+        sm: 34px,
+        md: 36px,
+        lg: 38px,
+        xl: 40px,
+        xxl: 42px
+    ),
+    'h2': (
+        xs: 28px,
+        sm: 29.75px,
+        md: 31.5px,
+        lg: 33.25px,
+        xl: 35px,
+        xxl: 36.75px
+    ),
+    'h3': (
+        xs: 24px,
+        sm: 25.5px,
+        md: 27px,
+        lg: 28.5px,
+        xl: 30px,
+        xxl: 31.5px
+    ),
+    'h4': (
+        xs: 20px,
+        sm: 21.25px,
+        md: 22.5px,
+        lg: 23.75px,
+        xl: 25px,
+        xxl: 26.25px
+    ),
+    'h5': (
+        xs: 18px,
+        sm: 19.125px,
+        md: 20.25px,
+        lg: 21.375px,
+        xl: 22.5px,
+        xxl: 23.625px
+    ),
+    'h6': (
+        xs: 16px,
+        sm: 17px,
+        md: 18px,
+        lg: 19px,
+        xl: 20px,
+        xxl: 21px
+    ),
+    'small': (
+        xs: 14px,
+        sm: 14.875px,
+        md: 15.75px,
+        lg: 16.625px,
+        xl: 17.5px,
+        xxl: 18.375px
+    )
+);
+
+@mixin responsive-font($type) {
+    @if map.has-key($font-sizes, $type) {
+        $type-map: map.get($font-sizes, $type);
+        font-size: map.get($type-map, xs);
+
+        @each $breakpoint-name, $breakpoint-size in $breakpoints {
+            @if $breakpoint-name != xs {
+                @media (min-width: $breakpoint-size) {
+                    font-size: map.get($type-map, $breakpoint-name);
+                }
+            }
+        }
+    } @else {
+        @warn "Responsive font size '#{$type}' not found.";
+    }
+}
+
+body, input, button, textarea {
+    @include responsive-font('base');
+}
+
+h1 {
+    @include responsive-font('h1');
+}
+
+h2 {
+    @include responsive-font('h2');
+}
+
+h3 {
+    @include responsive-font('h3');
+}
+
+h4 {
+    @include responsive-font('h4');
+}
+
+h5 {
+    @include responsive-font('h5');
+}
+
+h6 {
+    @include responsive-font('h6');
+}
+
+small {
+    @include responsive-font('small');
+}

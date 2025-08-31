@@ -1,0 +1,57 @@
+@use '../includes/mixins' as *;
+@use '../includes/variables' as *;
+
+.auth-layout {
+    height: 100vh;
+    @include flex(column, center, center);
+    background-image: url($url + 'auth-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    .auth-layout-form {
+        @include flex(column, center, center);
+        @include glass;
+        border-radius: 16px;
+        width: 700px;
+        max-width: calc(100% - 0.7rem);
+        padding: clamp(0.5rem, 5vw, 2rem);
+        .exit {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.5rem;
+            color: $font-color;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: 0.3s ease;
+            &:hover {
+                opacity: 1;
+            }
+        }
+        h1 {
+            color: $secondary-color;
+            text-transform: uppercase;
+            font-size: clamp(3rem, 5vw, 3.5rem);
+            opacity: 0.8;
+            transition: 0.3s ease;
+            user-select: none;
+            margin-bottom: 1rem;
+            &:hover {
+                opacity: 1;
+            }
+        }
+        form {
+            @include flex(column, center, center);
+            gap: 1rem;
+            padding: clamp(1rem, 5vw, 4rem);
+            padding-top:5rem;
+            border-radius: 8px;
+            width: 100%;
+                button {
+                    @include buttonGradient();
+                    margin-bottom:1rem;
+                }
+        }
+    }
+}

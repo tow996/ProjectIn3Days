@@ -1,0 +1,11 @@
+$url: 'http://localhost:5173/';
+$primary-color: #06034e;
+$primary-color-lighter: #090575;
+$secondary-color: #ff4081;
+$secondary-color-lighter: #fd4d88;
+$font-color: #ffffff;
+$basic-tier: linear-gradient(90deg, #fa9e15, #f5550b);
+$standard-tier: linear-gradient(90deg, $secondary-color, $secondary-color-lighter);
+$premium-tier: linear-gradient(90deg, #3B82F6, #0EA5E9);
+$build-responsive-tablet: 1024px;
+$build-responsive-phone: 500px;

@@ -1,0 +1,128 @@
+@use '../includes/mixins' as *;
+@use '../includes/variables' as *;
+
+.page-header {
+    position: fixed;
+    z-index: 9999;
+    width: 100%;
+    nav {
+        @include flex(row, space-between, center);
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.8) 100%, rgba(0,0,0,0));
+        flex-wrap: wrap;
+        position: relative;
+
+        .logo {
+            position: static;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 25px;
+            height: 20px;
+            cursor: pointer;
+
+            span {
+                display: block;
+                height: 3px;
+                background: white;
+                border-radius: 2px;
+                transition: 0.3s;
+            }
+
+            &.open span:nth-child(1) {
+                transform: rotate(45deg) translateY(8px);
+            }
+
+            &.open span:nth-child(2) {
+                opacity: 0;
+            }
+
+            &.open span:nth-child(3) {
+                transform: rotate(-45deg) translateY(-8px);
+            }
+        }
+
+        ul {
+            @include flex(row, center, center);
+            list-style: none;
+
+            li {
+                margin: 0 15px;
+
+                a {
+                    text-decoration: none;
+                    font-weight: bold;
+                    color: hsla(0, 0%, 100%, 0.90);
+                    transition: 0.3s ease;
+                    text-transform: uppercase;
+                    &:hover {
+                        color: $secondary-color;
+                    }
+                }
+            }
+
+            @media screen and (max-width: 768px) {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: linear-gradient(to bottom, rgb(8, 8, 8), rgba(0, 0, 0, 0.8));
+                flex-direction: column;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+
+                &.nav-open {
+                    max-height: 500px;
+                }
+
+                li {
+                    width:70%;
+                    padding:0.5rem;
+                    text-align: center;
+                    font-size:1.7em;
+                    margin: 1rem 0;
+                }
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .nav-toggle {
+                display: flex;
+            }
+
+            ul {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.page-footer {
+    @include flex(column, center, center);
+    background: linear-gradient(50deg, #ff408050 -20%, rgba(0,0,0,0.8) 55%, rgba(22, 22, 22, 0.637));
+    border-top: 1px solid #ff408054;
+    padding:2rem;
+    gap:2rem;
+    .socials {
+        @include flex(row, center, center);
+        flex-wrap: wrap;
+        gap: 2rem;
+        a {
+            color: #fff;
+            font-size: 1.5rem;
+            transition: 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: $secondary-color;
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+}
