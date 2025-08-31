@@ -27,23 +27,28 @@ Follow these steps to get the backend running:
     pip install -r requirements.txt
     ```
 
-4.  **Run database migrations:**
+3.  **Enter App Directory**
+    ```bash
+    cd app
+    ```
+
+5.  **Run database migrations:**
     ```bash
     python manage.py makemigrations
     python manage.py migrate
     ```
 
-5.  **Seed the database with sample data:**
+6.  **Seed the database with sample data:**
     ```bash
     python seed_data.py
     ```
 
-6.  **Create a superuser:**
+7.  **Create a superuser:**
     ```bash
     python manage.py createsuperuser
     ```
 
-7.  **Start the development server:**
+8.  **Start the development server:**
     ```bash
     python manage.py runserver
     ```
