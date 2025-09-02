@@ -193,7 +193,7 @@ const Checkout = () => {
                     {!loggedIn && items.length > 0 && (
                     <section className="login-register-prompt">
                         <h2>
-                        Please <Link to="/login">login</Link> or <Link to="/register">register</Link> to checkout
+                        Please <Link to="/login">login</Link> or <Link to="/signup">signup</Link> to checkout
                         </h2>
                     </section>
                     )}

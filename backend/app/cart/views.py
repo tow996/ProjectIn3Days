@@ -26,9 +26,11 @@ def add_to_cart(request):
         if not product_id:
             return JsonResponse({'status': 'error', 'message': 'Product must have an id'}, status=400)
 
-        cart, _ = Cart.objects.get_or_create(user=user, is_active=True)
+        cart = Cart.objects.filter(user=user, is_active=True).first()
+        if not cart:
+            cart = Cart.objects.create(user=user, is_active=True)
 
-        # Try to find an existing CartItem with the same product id
+        # Find existing item with this product id
         existing_item = None
         for item in cart.items.all():
             if item.product.get('id') == product_id:
@@ -88,9 +90,11 @@ def view_cart(request):
     if not user.is_authenticated:
         return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=401)
 
-    cart, _ = Cart.objects.get_or_create(user=user, is_active=True)
-    items = cart.items.all()
+    cart = Cart.objects.filter(user=user, is_active=True).first()
+    if not cart:
+        cart = Cart.objects.create(user=user, is_active=True)
 
+    items = cart.items.all()
     cart_data = [
         {
             'product': item.product,
@@ -118,5 +122,5 @@ def delete_cart(request):
         cart.is_active = False
         cart.save()
         Cart.objects.create(user=user, is_active=True)
-        
+
     return JsonResponse({'status': 'success', 'message': 'Cart cleared and reset'})
