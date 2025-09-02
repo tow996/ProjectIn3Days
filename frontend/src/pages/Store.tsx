@@ -85,7 +85,7 @@ const Store = () => {
 
     return (
         <PageLayout>
-            <title>Store - NEXUS PC</title>
+            <title>Store - Nexus PC</title>
             <div className='store-wrapper'>
                 <h1>Store</h1>
                 <div className='store-items'>

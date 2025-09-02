@@ -85,9 +85,8 @@ const Checkout = () => {
 
     return (
         <PageLayout>
+            <title>Checkout - Nexus PC</title>
             <div className="checkout-page">
-                
-                    
                     {items.length > 0 && (
                         <section className="cart-preview">
                         <div className="cart-items-list">
