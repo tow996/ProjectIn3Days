@@ -31,11 +31,13 @@
 
 .store-items {
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
     width: 100%;
     margin-top: 3rem;
-
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
     .store-item {
         @include flex(column, center, center);
         padding: 2rem;
@@ -81,7 +83,9 @@
             .store-item-buttons {
                 @include flex(row, center, center);
                 gap: 1rem;
-                flex-wrap: wrap;
+                @media (max-width: 400px) {
+                    flex-direction: column;
+                }
                 .store-item-button {
                     @include flex(row, center, center);
                     gap: 0.5rem;
