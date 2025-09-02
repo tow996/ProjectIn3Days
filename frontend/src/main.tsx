@@ -7,17 +7,20 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { UserProvider } from "./store/UserProvider";
 import { BrowserRouter } from "react-router-dom";
+import { CartProvider } from "./store/CartProvider";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
-            <UserProvider>
-                <BrowserRouter>
-                    <App />
-                </BrowserRouter>
-            </UserProvider>
+            <CartProvider>
+                <UserProvider>
+                    <BrowserRouter>
+                        <App />
+                    </BrowserRouter>
+                </UserProvider>
+            </CartProvider>
         </QueryClientProvider>
     </React.StrictMode>
 );

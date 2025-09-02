@@ -7,6 +7,8 @@ export type PartComponent = {
 };
 
 export type PCBuild = {
+    id: number;
+    name: string;
     cpu: PartComponent | null;
     gpu: PartComponent | null;
     motherboard: PartComponent | null;
@@ -15,8 +17,9 @@ export type PCBuild = {
     case: PartComponent | null;
     storage: PartComponent | null;
     cooling: PartComponent | null;
-    totalPrice: number;
+    price: number;
     tier: string | null;
+    image?: string;
 };
 
 export type BuilderAPIResponse = {

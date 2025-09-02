@@ -50,7 +50,18 @@
                 font-size: 1.2em;
                 opacity: 0.8;
             }
+
+            #visit-store {
+                @include buttonGradient($secondary-color, #007BFF);
+                padding: 1rem;
+                font-size: 1.2em;
+                opacity: 0.8;
+            }
         }
+    }
+    .home-buttons {
+        @include flex(row, center, center);
+        gap: 1rem;
     }
 }
 

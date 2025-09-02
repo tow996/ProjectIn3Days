@@ -27,8 +27,12 @@ const Home = () => {
                     <h1 className="main-heading">Built for You. Built by Nexus PCs.</h1>
                     <p className="sub-text">
                         Build your dream PC with Nexus PCs. We create high-performance, custom-built computers for gamers, creators, and professionals, hand-selecting every component to bring your vision to life.      
+                        We also sell bunch of periferals and accessories in our store.
                     </p>
-                    <Link to='/build'><button>Build Your PC</button> </Link>
+                    <div className="home-buttons">
+                        <Link to='/build'><button>Build Your PC</button> </Link>
+                        <Link to='/store'><button id='visit-store'>Visit Store</button> </Link>
+                    </div>
                     </div>
                 </div>
             </section>

@@ -9,8 +9,10 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import Radio from '../components/reusable/Radio';
 import PageLayout from '../layout/PageLayout';
 import BuildComponent from '../components/Build/BuildComponent';
-import { UserContext } from '../store/UserContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../store/CartContext';
+import { randomNumber } from '../utils/randomString';
+import { toast } from 'react-toastify';
 
 type Tiers = 'basic' | 'standard' | 'premium';
 type SelectableComponentTypes = 'cpu' | 'gpu' | 'ram' | 'case' | 'storage';
@@ -29,6 +31,8 @@ const Build = () => {
     const [selectedTier, setSelectedTier] = useState<Tiers>('basic');
 
     const [build, setBuild] = useState<PCBuild>({
+        id: randomNumber(100000, 999999),
+        name: `${selectedTier.toUpperCase()} Build`,
         cpu: null,
         gpu: null,
         motherboard: null,
@@ -37,12 +41,12 @@ const Build = () => {
         case: null,
         storage: null,
         cooling: null,
-        totalPrice: 0,
+        price: 0,
         tier: null,
     });
 
-    const user = useContext(UserContext);
-
+    const cart = useContext(CartContext)
+    
     const imageRef = useRef<HTMLImageElement>(null);
 
     // 🔁 Animate image when case changes
@@ -56,7 +60,7 @@ const Build = () => {
     }, [build.case?.image]);
 
     // 🔁 Stable function to calculate total price
-    const calculateTotalPrice = useCallback((currentBuild: PCBuild): number => {
+    const calculatePrice = useCallback((currentBuild: PCBuild): number => {
         const parts = [
             currentBuild.cpu,
             currentBuild.gpu,
@@ -88,6 +92,8 @@ const Build = () => {
         const cooling = tierConfig.components.find(c => c.type === 'cooling') || null;
 
         const newBuild: PCBuild = {
+            id: randomNumber(100000, 999999),
+            name: `${selectedTier.toUpperCase()} Build`,
             cpu: tierConfig.cpuOptions[0] || null,
             gpu: tierConfig.gpuOptions[0] || null,
             motherboard,
@@ -96,13 +102,13 @@ const Build = () => {
             case: data.shared.case[0] || null,
             storage: data.shared.storage[0] || null,
             cooling,
-            totalPrice: 0,
+            price: 0,
             tier: selectedTier,
         };
 
-        const price = calculateTotalPrice(newBuild);
-        setBuild({ ...newBuild, totalPrice: price });
-    }, [data, selectedTier, calculateTotalPrice]);
+        const price = calculatePrice(newBuild);
+        setBuild({ ...newBuild, price: price });
+    }, [data, selectedTier, calculatePrice]);
 
     // 🔁 Change selected component
     const handleComponentChange = useCallback(
@@ -128,11 +134,11 @@ const Build = () => {
                     [type]: newComponent,
                 };
 
-                const price = calculateTotalPrice(nextBuild);
-                return { ...nextBuild, totalPrice: price };
+                const price = calculatePrice(nextBuild);
+                return { ...nextBuild, price: price };
             });
         },
-        [data, selectedTier, calculateTotalPrice]
+        [data, selectedTier, calculatePrice]
     );
 
     const handleTierChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,15 +158,23 @@ const Build = () => {
 
     const navigate = useNavigate();
 
-    const handleOrder = useCallback(() => {
-        const randomString = Math.random().toString(36).substring(2, 15); 
-        const buildData = {
+    const handleAddToCart = useCallback(() => {
+        const buildData: PCBuild = {
             ...build,
+            image: build.case?.image
         }
-        console.log(buildData);
-        sessionStorage.setItem(randomString, JSON.stringify(buildData));
-        navigate('/checkout/' + randomString);
-    }, [build, navigate]);
+        toast.success('Build added to cart!');
+        cart.addItem(buildData);
+    }, [build, cart]);
+
+    const handleAddToCartAndCheckout = useCallback(() => {
+        const buildData: PCBuild = {
+            ...build,
+            image: build.case?.image
+        }
+        cart.addItem(buildData);
+        navigate('/checkout');
+    }, [build, cart, navigate]);
 
     if (isLoading) {
         return (    
@@ -266,15 +280,12 @@ const Build = () => {
                     </div>
 
                     <div className='total-price'>
-                        <h2>Total Price: <span>${build.totalPrice.toFixed(2)}</span></h2>
+                        <h2>Total Price: <span>${build.price.toFixed(2)}</span></h2>
                     </div>
 
                     <div className='order-now'>
-                        {user.loggedIn ? (
-                            <button className='btn primary' onClick={handleOrder}>Order Now!</button>
-                        ) : (
-                            <Link to='/signup'><button>Order Now!</button></Link>
-                        )}
+                        <button className='btn primary' onClick={handleAddToCart}>Add to cart</button>
+                        <button className='btn primary' onClick={handleAddToCartAndCheckout}>Add to cart & checkout</button>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,124 @@
+@use '../includes/mixins' as *;
+@use '../includes/variables' as *;
+
+.store-wrapper {
+    @include flex(column, center, center);
+    min-height: calc(100vh - 4rem);
+    padding: 5rem 2rem 2rem 2rem;
+    width: 100%;
+    h1 {
+        @include page-title;
+    }
+}
+
+@property --grad-color1 {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: rgba(255, 64, 129, 0.1);
+}
+
+@property --grad-color2 {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: rgba(0, 0, 0, 0.05);
+}
+
+.store-items {
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    margin-top: 3rem;
+
+    .store-item {
+        @include flex(column, center, center);
+        padding: 2rem;
+        border: 1px solid $secondary-color;
+        border-radius: 25px;
+        position: relative;
+        background: linear-gradient(135deg, var(--grad-color1), var(--grad-color2));
+        gap: 1rem;
+        height: 500px;
+
+        transition: --grad-color1 0.5s ease, --grad-color2 0.5s ease;
+
+        &:hover {
+            box-shadow: 1px 1px 5px 1px $secondary-color;
+            
+            --grad-color1: rgba(255, 64, 129, 0.3);
+            --grad-color2: rgba(0, 0, 0, 0.05);
+
+            img {
+                transform: scale(1.05);
+            }
+        }
+
+        img {
+            max-width: 400px;
+            width: 100%;
+            object-fit: contain;
+            height: auto;
+            aspect-ratio: 1.5 / 1;
+            transition: all 0.3s ease-in-out;
+        }
+        .store-item-bottom {
+            @include flex(column, center, center);
+            gap: 2rem;
+            text-align: center;
+            padding-top:1rem;
+            p {
+                color: $font-color;
+                font-size:2rem;
+                font-weight: bold;
+            }
+
+            .store-item-buttons {
+                @include flex(row, center, center);
+                gap: 1rem;
+                .store-item-button {
+                    @include flex(row, center, center);
+                    gap: 0.5rem;
+                    background-color: $secondary-color;
+                    color: $font-color;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+
+                    &:hover {
+                        background-color: $secondary-color-lighter;
+                    }
+                    &.preview {
+                        background-color: #dfdfdf;
+                        color:rgb(26, 26, 26);
+                        &:hover {
+                            background-color: #fff;
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: $secondary-color;
+    margin-right: 0.5rem;
+}
+
+.store-item-discount-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: $secondary-color;
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 2rem;
+}
+

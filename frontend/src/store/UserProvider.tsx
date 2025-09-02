@@ -1,7 +1,8 @@
-import { useEffect, useState, type FC } from "react";
+import { useContext, useEffect, useState, type FC } from "react";
 import { UserContext } from "./UserContext";
 import { useQuery } from "@tanstack/react-query";
 import api from "../api/axios";
+import { CartContext } from "./CartContext";
 
 const handleFetchData = async () => {
     const response = await api.get('/me');
@@ -16,6 +17,8 @@ const handleLogOutUser = async () => {
 export const UserProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const { fetchAndSetCart, clearCartOnlyLocal, syncLocalCartToServer, syncAuthStatus } = useContext(CartContext);
+    const [firstLoad, setFirstLoad] = useState(true);
 
     const { data, isSuccess, isError, isLoading, refetch } = useQuery({
         queryKey: ["user-info"],
@@ -32,24 +35,37 @@ export const UserProvider: FC<{ children: React.ReactNode }> = ({ children }) =>
             setLoggedIn(false);
             setIsAdmin(false);
         }
-    }, [data, isSuccess, isError]);
+        if (firstLoad && loggedIn) {
+            setFirstLoad(false);
+            fetchAndSetCart();
+        }
+    }, [data, isSuccess, isError, loggedIn, fetchAndSetCart, firstLoad]);
 
     const logOut = async () => {
         try {
-            await handleLogOutUser();
+            
+            await handleLogOutUser(); 
             setLoggedIn(false);
             setIsAdmin(false);
+            syncAuthStatus(false); 
+            clearCartOnlyLocal();
             await refetch();
         } catch (error) {
             console.error("Logout failed:", error);
         }
+    };
+    const updateUserInfo = async () => {
+        syncAuthStatus(true)
+        await refetch();                  
+        await syncLocalCartToServer();    
+        await fetchAndSetCart();          
     };
 
     const contextValue = {
         loggedIn,
         isAdmin,
         loading: isLoading,
-        updateUserInfo: refetch,
+        updateUserInfo,
         logOut,
     };
 

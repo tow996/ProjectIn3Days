@@ -1,132 +1,77 @@
-import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import PageLayout from '../layout/PageLayout';
-import NotFound from './NotFound';
-import api from '../api/axios';
-import { useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import Input from '../components/reusable/Input';
-import { getValidationRules } from '../utils/validationRules';
-import type { BillingAddress, CreateOrder } from '../types/order';
-import type { PCBuild } from '../types/builder';
-
-const validateBuildAPI = async (build: PCBuild) => {
-    console.log(build);
-    const response = await api.post('/builder/validate_build', { build });
-    return response.data.isValid;
-};
+import { useContext, useState } from "react";
+import { Link } from "react-router-dom";
+import PageLayout from "../layout/PageLayout";
+import { CartContext } from "../store/CartContext";
+import { UserContext } from "../store/UserContext";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import Input from "../components/reusable/Input";
+import { getValidationRules } from "../utils/validationRules";
+import type { BillingAddress, CreateOrder } from "../types/order";
+import type { CartItem } from "../store/CartContext";
+import api from "../api/axios";
 
 const createOrderAPI = async (data: CreateOrder) => {
-    const response = await api.post('/orders/create/', data);
+    const response = await api.post("/orders/create/", data);
     return response.data;
 };
 
-
 const Checkout = () => {
-    const { id } = useParams<{ id: string }>();
-    const [build, setBuild] = useState<PCBuild | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { items, removeItem, increaseItemQuantity, decreaseItemQuantity, clearCart } = useContext(CartContext);
+    const { loggedIn } = useContext(UserContext);
+    const [orderSuccess, setOrderSuccess] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
         reset,
     } = useForm<BillingAddress>({
-        mode: 'onSubmit',
-        reValidateMode: 'onSubmit',
+        mode: "onSubmit",
+        reValidateMode: "onSubmit",
     });
+
+    // Calculate total price from cart items
+    const totalPrice = items.reduce((acc, cartItem) => acc + cartItem.item.price * cartItem.quantity, 0);
 
     const orderMutation = useMutation({
         mutationFn: createOrderAPI,
         onSuccess: () => {
-            sessionStorage.removeItem(id || '');
+            toast.success("Order created successfully!");
+            clearCart();
             reset();
-
+            setOrderSuccess(true);
         },
         onError: () => {
-            toast.error('Failed to create order.');
+            toast.error("Failed to create order.");
         },
     });
 
-    // Load & validate build on mount
-    useEffect(() => {
-        const init = async () => {
-            if (!id) {
-                setError('No build ID provided.');
-                setLoading(false);
-                return;
-            }
-
-            const storedBuild = sessionStorage.getItem(id);
-            if (!storedBuild) {
-                setError('No build data found in session storage.');
-                setLoading(false);
-                return;
-            }
-
-            let parsedBuild: PCBuild;
-
-            try {
-                parsedBuild = JSON.parse(storedBuild);
-            } catch {
-                setError('Failed to parse build data.');
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const isValid = await validateBuildAPI(parsedBuild);
-                if (!isValid) {
-                    setError('Invalid build configuration.');
-                    // Don't return yet, setLoading at end
-                } else {
-                    setBuild(parsedBuild);
-                }
-            } catch {
-                setError('Failed to validate build.');
-            }
-
-            setLoading(false);
-        };
-
-        init();
-    }, [id]);
-
     const onSubmit = (data: BillingAddress) => {
-        if (!build) {
-            toast.error('Build not loaded.');
+        if (!items.length) {
+            toast.error("Your cart is empty.");
             return;
         }
 
+        // Prepare order data from cart items
         const orderData: CreateOrder = {
-            total_price: build.totalPrice,
-            order_info: JSON.stringify(build),
+            total_price: totalPrice,
+            order_info: JSON.stringify(
+                items.map(({ item, quantity }) => ({
+                    product_id: item.id,
+                    name: item.name,
+                    quantity,
+                    price: item.price,
+                }))
+            ),
             billing_address: data,
         };
 
         orderMutation.mutate(orderData);
     };
 
-    if (loading) {
-        return (
-            <PageLayout>
-                <div>Loading...</div>
-            </PageLayout>
-        );
-    }
-
-    if (error || !build) {
-        return (
-            <PageLayout>
-                {/* Pass error message to NotFound if you want to debug */}
-                <NotFound />
-            </PageLayout>
-        );
-    }
-
-    if (orderMutation.isSuccess) {
+    if (orderSuccess) {
         return (
             <PageLayout>
                 <div className="checkout-page-success">
@@ -140,16 +85,37 @@ const Checkout = () => {
 
     return (
         <PageLayout>
-            <div className='checkout-page'>
+            <div className="checkout-page">
+                
+                    
+                    {items.length > 0 && (
+                        <section className="cart-preview">
+                        <div className="cart-items-list">
+                        {items.map(({ item, quantity }: CartItem) => (
+                            <div key={item.id} className="cart-item">
+                                <div className='image-container'>
+                                    <img src={item.image} alt={item.name} />
+                                </div>
+                                <div className="cart-item-details">
+                                    <strong>{item.name}</strong> - { ((Number(item.price) || 0) * quantity).toFixed(2) }$
+                                </div>
+                                <div className="cart-item-controls">
+                                    <button onClick={() => decreaseItemQuantity(item.id)} disabled={quantity <= 1}>-</button>
+                                    <span>{quantity}</span>
+                                    <button onClick={() => increaseItemQuantity(item.id)}>+</button>
+                                    <button onClick={() => removeItem(item.id)}>Remove</button>
+                                </div>
+                            </div>
+                        ))}
+                        </div>
+                        <h3>Total: <span className="total-price">${totalPrice.toFixed(2)}</span></h3>
+                        </section>
+                    )}
 
-                <section className="checkout-form">
-                    <h2>Billing Information</h2>
-                    <form
-                        onSubmit={handleSubmit(onSubmit)}
-                        noValidate
-                        autoComplete="off"
-                        className="page-form"
-                    >
+                    {loggedIn && items.length > 0 ? (
+                    <section className="checkout-form">
+                        <h2>Billing Information</h2>
+                        <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off" className="page-form">
                         <Input
                             id="address"
                             label="Address"
@@ -157,7 +123,7 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon location"
                             type="text"
-                            register={register('address', getValidationRules('address'))}
+                            register={register("address", getValidationRules("address"))}
                             error={errors.address?.message}
                         />
                         <Input
@@ -167,7 +133,7 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon city"
                             type="text"
-                            register={register('city', getValidationRules('city'))}
+                            register={register("city", getValidationRules("city"))}
                             error={errors.city?.message}
                         />
                         <Input
@@ -177,7 +143,7 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon state"
                             type="text"
-                            register={register('state', getValidationRules('state'))}
+                            register={register("state", getValidationRules("state"))}
                             error={errors.state?.message}
                         />
                         <Input
@@ -187,7 +153,7 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon postal"
                             type="text"
-                            register={register('postal_code', getValidationRules('postal_code'))}
+                            register={register("postal_code", getValidationRules("postal_code"))}
                             error={errors.postal_code?.message}
                         />
                         <Input
@@ -197,7 +163,7 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon country"
                             type="text"
-                            register={register('country', getValidationRules('country'))}
+                            register={register("country", getValidationRules("country"))}
                             error={errors.country?.message}
                         />
                         <Input
@@ -207,34 +173,32 @@ const Checkout = () => {
                             className="form-group"
                             customClass="icon phone"
                             type="tel"
-                            register={register('phone_number', getValidationRules('phone_number'))}
+                            register={register("phone_number", getValidationRules("phone_number"))}
                             error={errors.phone_number?.message}
                         />
                         <button type="submit" disabled={orderMutation.isPending}>
-                            {orderMutation.isPending ? <span className="loader"></span> : 'Submit Order'}
+                            {orderMutation.isPending ? <span className="loader"></span> : "Submit Order"}
                         </button>
-                    </form>
-                </section>
+                        </form>
+                    </section>
+                    ) : (
+                    items.length === 0 && (
+                        <section className="empty-cart-message">
+                        <h2>Your cart is empty</h2>
+                        <p>Please add items to your cart before you can check out</p>
+                        </section>
+                    )
+                    )}
 
-                
-                <section className="pc-build-details">
-                    <h2>PC Build Details</h2>
-                    <ul>
-                        {Object.entries(build).map(([key, value]) => {
-                            if (typeof value === 'object' && value?.name) {
-                                return (
-                                    <li key={key}>
-                                        <strong>{key.toUpperCase()}:</strong> {value.name} (${value.price})
-                                    </li>
-                                );
-                            }
-                            return null;
-                        })}
-                        <li>
-                            <strong>Total Price:</strong> ${build.totalPrice}
-                        </li>
-                    </ul>
-                </section>
+                    {!loggedIn && items.length > 0 && (
+                    <section className="login-register-prompt">
+                        <h2>
+                        Please <Link to="/login">login</Link> or <Link to="/register">register</Link> to checkout
+                        </h2>
+                    </section>
+                    )}
+
+
             </div>
         </PageLayout>
     );

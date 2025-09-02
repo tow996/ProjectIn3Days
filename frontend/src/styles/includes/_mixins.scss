@@ -1,4 +1,4 @@
-
+@use './variables' as *;
 @mixin flex($direction: row, $justify: center, $align: center) {
     display: flex;
     flex-direction: $direction;
@@ -90,4 +90,10 @@
         opacity: 1;
         transform: scale($scale);
     }
+}
+
+@mixin page-title {
+    font-size: clamp(3rem, 6vw, 4rem);
+    color: $secondary-color;
+    margin-top: clamp(1rem, 2vw, 4rem);
 }

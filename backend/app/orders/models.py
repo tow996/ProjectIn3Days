@@ -14,8 +14,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     billing_address = models.OneToOneField('BillingAddress', on_delete=models.CASCADE, null=True, blank=True)
-    def __str__(self):
-        return f"Order {self.id} by {self.billing_address.user.username} - ${self.total_price}"
+    # def __str__(self):
+    #     return f"Order {self.id} by {self.billing_address.user.username} - ${self.total_price}"
 
 class BillingAddress(models.Model):
     address = models.CharField(max_length=255)
@@ -26,5 +26,5 @@ class BillingAddress(models.Model):
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"Billing Address for Order {self.order.id}"
+    # def __str__(self):
+    #     return f"Billing Address for Order {self.order.id}"

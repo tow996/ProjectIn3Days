@@ -6,20 +6,25 @@ from django.db import transaction
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
+# Import all necessary models
 from builder.models import PartComponent, TierConfig, TierPart
+from peripherals.models import Peripheral
 
 def seed_database():
     """
-    Deletes all existing data and seeds the database with new PC parts and configurations.
+    Deletes all existing data and seeds the database with new PC parts, peripherals, and configurations.
     """
     print('Deleting old data...')
+    # Delete data from all models to ensure a clean slate
     PartComponent.objects.all().delete()
+    Peripheral.objects.all().delete()
     TierPart.objects.all().delete()
     TierConfig.objects.all().delete()
     print('Old data deleted.')
 
-    # New data structure matching the frontend and database models
+    # New data structure including PC components, peripherals, and configurations
     data = {
+        # Standard PC components that can be used in configurations
         "shared": [
             {"name": "G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5 6000MHz", "shortName": "Trident Z5 32GB", "price": 105.00, "type": "ram"},
             {"name": "G.Skill Trident Z5 Neo RGB 64GB (2x32GB) DDR5 6000MHz", "shortName": "Trident Z5 64GB", "price": 210.00, "type": "ram"},
@@ -29,8 +34,204 @@ def seed_database():
             {"name": "Anime Ayaya", "shortName": "Anime Pink", "price": 160.00, "type": "case", "image": "http://localhost:5173/preview-case-3.png"},
             {"name": "Samsung 980 PRO 1TB PCIe 4.0 NVMe SSD", "shortName": "980 PRO 1TB", "price": 110.00, "type": "storage"},
             {"name": "Samsung 990 PRO 2TB PCIe 4.0 NVMe SSD", "shortName": "990 PRO 2TB", "price": 200.00, "type": "storage"},
-            {"name": "Samsung 990 PRO 4TB PCIe 4.0 NVMe SSD", "shortName": "990 PRO 4TB", "price": 400.00, "type": "storage"}
+            {"name": "Samsung 990 PRO 4TB PCIe 4.0 NVMe SSD", "shortName": "990 PRO 4TB", "price": 400.00, "type": "storage"},
         ],
+        # Peripherals with a JSON description field and specific image URLs
+        "peripherals": [
+            # Headsets
+            {
+                "name": "AuraFlow Aurora", 
+                "shortName": "Aura Aurora", 
+                "price": 129.99, 
+                "type": "headset", 
+                "image": "http://localhost:5173/peripherals/headset_1.png",
+                "description": {
+                    "audio_driver": "50mm Neodymium",
+                    "connectivity": "Wireless (2.4GHz) / Wired (USB-C)",
+                    "features": "RGB lighting, detachable noise-cancelling microphone, 30-hour battery life",
+                    "compatibility": "PC, PS5, Xbox Series X|S, Nintendo Switch"
+                }
+            },
+            {
+                "name": "SonicPulse Vortex", 
+                "shortName": "Sonic Vortex", 
+                "price": 89.50, 
+                "type": "headset", 
+                "image": "http://localhost:5173/peripherals/headset_2.png",
+                "description": {
+                    "audio_driver": "40mm High-Fidelity",
+                    "connectivity": "Wired (3.5mm Jack)",
+                    "features": "In-line volume controls, lightweight design, breathable earcup cushions",
+                    "compatibility": "PC, Mac, Xbox, PlayStation, Mobile"
+                }
+            },
+            {
+                "name": "EchoGlide Phantom", 
+                "shortName": "Echo Phantom", 
+                "price": 249.00, 
+                "type": "headset", 
+                "image": "http://localhost:5173/peripherals/headset_3.png",
+                "description": {
+                    "audio_driver": "Planar Magnetic",
+                    "connectivity": "Wireless (Bluetooth 5.2) / Wired (USB-C)",
+                    "features": "Active noise cancellation, spatial audio support, premium aluminum build",
+                    "compatibility": "PC, Mac, PS5"
+                },
+                "discount": 20.00
+            },
+            # Keyboards
+            {
+                "name": "Titanium Tactile", 
+                "shortName": "Titanium T", 
+                "price": 185.75, 
+                "type": "keyboard", 
+                "image": "http://localhost:5173/peripherals/keyboard_1.png",
+                "description": {
+                    "switch_type": "Tactile Mechanical Switches",
+                    "layout": "Full-size",
+                    "features": "Per-key RGB, programmable macros, USB-passthrough",
+                    "material": "Brushed aluminum frame"
+                }
+            },
+            {
+                "name": "Epsilon 65", 
+                "shortName": "Epsilon 65", 
+                "price": 110.00, 
+                "type": "keyboard", 
+                "image": "http://localhost:5173/peripherals/keyboard_2.png",
+                "description": {
+                    "switch_type": "Linear Hot-swappable Switches",
+                    "layout": "65% Compact",
+                    "features": "Sound-dampening foam, PBT keycaps, coiled cable included",
+                    "material": "Plastic"
+                }
+            },
+            # Mice
+            {
+                "name": "Stealth Stinger", 
+                "shortName": "Stealth Stinger", 
+                "price": 75.00, 
+                "type": "mouse", 
+                "image": "http://localhost:5173/peripherals/mouse_1.png",
+                "description": {
+                    "sensor": "Hyperion 16K Optical Sensor",
+                    "DPI": "16,000 max",
+                    "buttons": "6 programmable buttons",
+                    "weight": "85g (lightweight)"
+                }
+            },
+            {
+                "name": "Quantum Clicks", 
+                "shortName": "Quantum Clicks", 
+                "price": 55.00, 
+                "type": "mouse", 
+                "image": "http://localhost:5173/peripherals/mouse_2.png",
+                "description": {
+                    "sensor": "Phoenix 12K Sensor",
+                    "DPI": "12,000 max",
+                    "buttons": "8 buttons, side-scroll wheel",
+                    "weight": "95g"
+                },
+                "discount": 10.00
+            },
+            {
+                "name": "GlideForce Pro", 
+                "shortName": "GlideForce Pro", 
+                "price": 120.00, 
+                "type": "mouse", 
+                "image": "http://localhost:5173/peripherals/mouse_3.png",
+                "description": {
+                    "sensor": "Mercury 24K Sensor",
+                    "DPI": "24,000 max",
+                    "buttons": "12 buttons (MMO-style), modular side plate",
+                    "weight": "115g"
+                }
+            },
+            # Mousepads
+            {
+                "name": "Cosmic Drift XL", 
+                "shortName": "Cosmic Drift", 
+                "price": 29.99, 
+                "type": "mousepad", 
+                "image": "http://localhost:5173/peripherals/mousepad_1.png",
+                "description": {
+                    "material": "Micro-woven cloth surface",
+                    "size": "Extra-Large (900 x 400 mm)",
+                    "features": "Non-slip rubber base, stitched edges",
+                    "design": "Galaxy print"
+                }
+            },
+            {
+                "name": "PolyGlide Precision", 
+                "shortName": "PolyGlide", 
+                "price": 19.50, 
+                "type": "mousepad", 
+                "image": "http://localhost:5173/peripherals/mousepad_2.png",
+                "description": {
+                    "material": "Hard polymer surface",
+                    "size": "Medium (350 x 250 mm)",
+                    "features": "Optimized for high-DPI tracking, easy to clean",
+                    "design": "Monochrome"
+                }
+            },
+            {
+                "name": "FiberWeave RGB", 
+                "shortName": "FiberWeave RGB", 
+                "price": 45.00, 
+                "type": "mousepad", 
+                "image": "http://localhost:5173/peripherals/mousepad_3.png",
+                "description": {
+                    "material": "Hybrid fiber surface",
+                    "size": "Extended (900 x 400 mm)",
+                    "features": "16.8 million color RGB edge lighting, detachable cable",
+                    "design": "Geometric pattern"
+                }
+            },
+            # Monitors
+            {
+                "name": "Visual Horizon 27", 
+                "shortName": "Horizon 27", 
+                "price": 350.00, 
+                "type": "monitor", 
+                "image": "http://localhost:5173/peripherals/monitor_1.png",
+                "description": {
+                    "size": "27-inch",
+                    "resolution": "1440p",
+                    "refresh_rate": "144Hz",
+                    "panel_type": "IPS",
+                    "features": "AMD FreeSync Premium, HDR400, VESA mountable"
+                }
+            },
+            {
+                "name": "Clarity Edge 32", 
+                "shortName": "Clarity Edge", 
+                "price": 599.00, 
+                "type": "monitor", 
+                "image": "http://localhost:5173/peripherals/monitor_2.png",
+                "description": {
+                    "size": "32-inch",
+                    "resolution": "4K (3840x2160)",
+                    "refresh_rate": "165Hz",
+                    "panel_type": "Mini-LED",
+                    "features": "NVIDIA G-Sync Ultimate, DisplayHDR 1000, USB-C Power Delivery"
+                }
+            },
+            {
+                "name": "SpectraView 24", 
+                "shortName": "SpectraView", 
+                "price": 199.99, 
+                "type": "monitor", 
+                "image": "http://localhost:5173/peripherals/monitor_3.png",
+                "description": {
+                    "size": "24-inch",
+                    "resolution": "1080p",
+                    "refresh_rate": "75Hz",
+                    "panel_type": "VA",
+                    "features": "Built-in speakers, low blue light filter"
+                }
+            }
+        ],
+        # PC configurations
         "configs": {
             "basic": {
                 "components": [
@@ -91,11 +292,22 @@ def seed_database():
                 image=component_data.get('image', '')
             )
         
+        print('Seeding peripherals...')
+        for peripheral_data in data['peripherals']:
+            Peripheral.objects.create(
+                name=peripheral_data['name'],
+                shortName=peripheral_data['shortName'],
+                price=peripheral_data['price'],
+                type=peripheral_data['type'],
+                image=peripheral_data.get('image', ''),
+                discount=peripheral_data.get('discount', 0.00),
+                description=peripheral_data.get('description', {})
+            )
+
         print('Seeding tier configurations...')
         for tier, config_data in data['configs'].items():
             tier_config = TierConfig.objects.create(tier=tier)
             
-            # Fixed components (including cooling) and part options
             for group, components in config_data.items():
                 for component_data in components:
                     part = PartComponent.objects.create(
