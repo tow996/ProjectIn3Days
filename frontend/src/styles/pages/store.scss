@@ -9,6 +9,12 @@
     h1 {
         @include page-title;
     }
+    @media (max-width: 600px) {
+        padding: 5rem 1rem 1rem 1rem;
+        h1 {
+            font-size: 3.5rem;
+        }
+    }
 }
 
 @property --grad-color1 {
@@ -25,7 +31,7 @@
 
 .store-items {
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
     width: 100%;
     margin-top: 3rem;
