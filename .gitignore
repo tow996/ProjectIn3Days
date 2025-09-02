@@ -22,3 +22,4 @@ frontend/*.ntvs*
 frontend/*.njsproj
 frontend/*.sln
 frontend/*.sw?
+backend/app/db.sqlite3

@@ -81,6 +81,7 @@
             .store-item-buttons {
                 @include flex(row, center, center);
                 gap: 1rem;
+                flex-wrap: wrap;
                 .store-item-button {
                     @include flex(row, center, center);
                     gap: 0.5rem;
